@@ -5,6 +5,8 @@
 
 This tool provides an easy way to synchronize Overleaf projects from and to your local computer. No paid account necessary.
 
+This version was modified in order to connect to PLMlatex which uses an OAuth2 authentification. 
+https://plmlatex.math.cnrs.fr/
 ----
 
 ## Features
