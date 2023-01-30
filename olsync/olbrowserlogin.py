@@ -15,12 +15,13 @@ from PySide6.QtWebEngineWidgets import *
 from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEngineSettings, QWebEnginePage
 
 # Where to get the CSRF Token and where to send the login request to
-LOGIN_URL = "https://www.overleaf.com/login"
-PROJECT_URL = "https://www.overleaf.com/project"  # The dashboard URL
+LOGIN_URL = "https://plmlatex.math.cnrs.fr/login"
+PROJECT_URL = "https://plmlatex.math.cnrs.fr/project"  # The dashboard URL
 # JS snippet to extract the csrfToken
 JAVASCRIPT_CSRF_EXTRACTOR = "document.getElementsByName('ol-csrfToken')[0].content"
+JAVASCRIPT_EXTRACT_PROJECT_URL = "document.getElementsByClassName('project-list-table-name-link')[0].href"
 # Name of the cookies we want to extract
-COOKIE_NAMES = ["overleaf_session2", "GCLB"]
+COOKIE_NAMES = ["oauth.session","sharelatex.sid"]
 
 
 class OlBrowserLoginWindow(QMainWindow):
@@ -55,14 +56,27 @@ class OlBrowserLoginWindow(QMainWindow):
 
     def handle_load_finished(self):
         def callback(result):
-            self._csrf = result
-            self._login_success = True
-            QCoreApplication.quit()
+            #self._csrf = result
+            #self._login_success = True
+            #QCoreApplication.quit()
 
+            def callback(result):
+                self._csrf = result
+                self._login_success = True
+                QCoreApplication.quit()
+
+            self.webview.load(QUrl.fromUserInput(result))
+            self.webview.loadFinished.connect( lambda x:
+                self.webview.page().runJavaScript(
+                    JAVASCRIPT_CSRF_EXTRACTOR, 0, callback
+                )
+            )
         if self.webview.url().toString() == PROJECT_URL:
             self.webview.page().runJavaScript(
-                JAVASCRIPT_CSRF_EXTRACTOR, 0, callback
+                #JAVASCRIPT_CSRF_EXTRACTOR, 0, callback
+                JAVASCRIPT_EXTRACT_PROJECT_URL, 0, callback
             )
+
 
     def handle_cookie_added(self, cookie):
         cookie_name = cookie.name().data().decode('utf-8')

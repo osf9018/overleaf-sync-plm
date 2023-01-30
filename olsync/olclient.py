@@ -17,15 +17,15 @@ from socketIO_client import SocketIO
 import time
 
 # Where to get the CSRF Token and where to send the login request to
-LOGIN_URL = "https://www.overleaf.com/login"
-PROJECT_URL = "https://www.overleaf.com/project"  # The dashboard URL
+LOGIN_URL = "https://plmlatex.math.cnrs.fr/login"
+PROJECT_URL = "https://plmlatex.math.cnrs.fr/project"  # The dashboard URL
 # The URL to download all the files in zip format
-DOWNLOAD_URL = "https://www.overleaf.com/project/{}/download/zip"
-UPLOAD_URL = "https://www.overleaf.com/project/{}/upload"  # The URL to upload files
-FOLDER_URL = "https://www.overleaf.com/project/{}/folder"  # The URL to create folders
-DELETE_URL = "https://www.overleaf.com/project/{}/doc/{}"  # The URL to delete files
-COMPILE_URL = "https://www.overleaf.com/project/{}/compile?enable_pdf_caching=true"  # The URL to compile the project
-BASE_URL = "https://www.overleaf.com"  # The Overleaf Base URL
+DOWNLOAD_URL = "https://plmlatex.math.cnrs.fr/project/{}/download/zip"
+UPLOAD_URL = "https://plmlatex.math.cnrs.fr/project/{}/upload"  # The URL to upload files
+FOLDER_URL = "https://plmlatex.math.cnrs.fr/project/{}/folder"  # The URL to create folders
+DELETE_URL = "https://plmlatex.math.cnrs.fr/project/{}/doc/{}"  # The URL to delete files
+COMPILE_URL = "https://plmlatex.math.cnrs.fr/project/{}/compile?enable_pdf_caching=true"  # The URL to compile the project
+BASE_URL = "https://plmlatex.math.cnrs.fr"  # The Overleaf Base URL
 PATH_SEP = "/"  # Use hardcoded path separator for both windows and posix system
 
 class OverleafClient(object):
@@ -162,12 +162,11 @@ class OverleafClient(object):
             project_infos = project_infos_dict
 
         # Convert cookie from CookieJar to string
-        cookie = "GCLB={}; overleaf_session2={}" \
+        cookie = "oauth.session={}; sharelatex.sid={}" \
             .format(
-            self._cookie["GCLB"],
-            self._cookie["overleaf_session2"]
+            self._cookie["oauth.session"],
+            self._cookie["sharelatex.sid"]
         )
-
         # Connect to Overleaf Socket.IO, send a time parameter and the cookies
         socket_io = SocketIO(
             BASE_URL,
