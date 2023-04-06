@@ -21,7 +21,7 @@ https://plmlatex.math.cnrs.fr/
 The package is available via [PyPI](https://pypi.org/project/overleaf-sync/). Just run:
 
 ```
-moritz@github:~/test$ pip3 install overleaf-sync
+moritz@github:~/test$ pip3 install -e git+https://github.com/JulesColas97/overleaf-sync-plm/#egg=overleaf-sync
 ```
 
 That's it! Depending on your local Python installation, you might need to use `pip` instead of `pip3`.
