@@ -18,7 +18,7 @@ https://plmlatex.math.cnrs.fr/
 
 ## How To Use
 ### Install
-The package is available via [PyPI](https://pypi.org/project/overleaf-sync/). Just run:
+The original package is available via [PyPI](https://pypi.org/project/overleaf-sync/). To install the forked version, just run:
 
 ```
 moritz@github:~/test$ pip3 install -e git+https://github.com/JulesColas97/overleaf-sync-plm/#egg=overleaf-sync
