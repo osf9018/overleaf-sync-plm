@@ -45,9 +45,11 @@ except ImportError:
               help="Path to the .olignore file relative to sync path (ignored if syncing from remote to local). See "
                    "fnmatch / unix filename pattern matching for information on how to use it.")
 @click.option('-v', '--verbose', 'verbose', is_flag=True, help="Enable extended error logging.")
+@click.option('-d', '--ignore-delete', 'ignore', is_flag=True,
+              help="Ignore files to delete. Equivalent to always ignore the request for deleting files.")
 @click.version_option(package_name='overleaf-sync')
 @click.pass_context
-def main(ctx, local, remote, project_name, cookie_path, sync_path, olignore_path, verbose):
+def main(ctx, local, remote, project_name, cookie_path, sync_path, olignore_path, verbose, ignore):
     if ctx.invoked_subcommand is None:
         if not os.path.isfile(cookie_path):
             raise click.ClickException(
@@ -100,7 +102,8 @@ def main(ctx, local, remote, project_name, cookie_path, sync_path, olignore_path
                                                 os.path.getmtime(name),
                 from_name="remote",
                 to_name="local",
-                verbose=verbose)
+                verbose=verbose,
+                ignore=ignore)
         if local or sync:
             sync_func(
                 files_from=olignore_keep_list(olignore_path),
@@ -115,7 +118,8 @@ def main(ctx, local, remote, project_name, cookie_path, sync_path, olignore_path
                     project["lastUpdated"]).timestamp(),
                 from_name="local",
                 to_name="remote",
-                verbose=verbose)
+                verbose=verbose,
+                ignore=ignore)
 
 
 @main.command()
@@ -238,7 +242,7 @@ def write_file(path, content):
 
 def sync_func(files_from, deleted_files, create_file_at_to, delete_file_at_to, create_file_at_from, from_exists_in_to,
               from_equal_to_to, from_newer_than_to, from_name,
-              to_name, verbose=False):
+              to_name, verbose=False, ignore=False):
     click.echo("\nSyncing files from [%s] to [%s]" % (from_name, to_name))
     click.echo('=' * 40)
 
@@ -266,11 +270,14 @@ def sync_func(files_from, deleted_files, create_file_at_to, delete_file_at_to, c
             newly_add_list.append(name)
 
     for name in deleted_files:
-        delete_choice = click.prompt(
-            '\n-> Warning: file <%s> does not exist on [%s] anymore (but it still exists on [%s]).'
-            '\nShould the file be [d]eleted, [r]estored or [i]gnored?' % (name, from_name, to_name),
-            default="i",
-            type=click.Choice(['d', 'r', 'i']))
+        if ignore:
+            delete_choice = "i"
+        else:
+            delete_choice = click.prompt(
+                '\n-> Warning: file <%s> does not exist on [%s] anymore (but it still exists on [%s]).'
+                '\nShould the file be [d]eleted, [r]estored or [i]gnored?' % (name, from_name, to_name),
+                default="i",
+                type=click.Choice(['d', 'r', 'i']))
         if delete_choice == "d":
             delete_list.append(name)
         elif delete_choice == "r":
